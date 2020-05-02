@@ -53,6 +53,8 @@ void my_main() {
 
   int i;
   struct matrix *tmp;
+  struct matrix *polygons;
+  struct matrix *edges;
   struct stack *systems;
   screen t;
   zbuffer zb;
@@ -109,8 +111,154 @@ void my_main() {
   print_symtab();
   for (i=0;i<lastop;i++) {
 
-    printf("%d: ",i);
+    //printf("%d: ",i);
 
-    printf("\n");
+    //printf("\n");
+
+    switch (op[i].opcode)
+        {
+        case LIGHT:
+
+          light[COLOR][RED] = op[i].op.light.c[RED];
+          light[COLOR][GREEN] = op[i].op.light.c[GREEN];
+          light[COLOR][BLUE] = op[i].op.light.c[BLUE];
+
+          break;
+        case AMBIENT:
+          ambient.red = op[i].op.ambient.c[RED];
+          ambient.green = op[i].op.ambient.c[GREEN];
+          ambient.blue = op[i].op.ambient.c[BLUE];
+          break;
+
+        case SAVE_COORDS:
+          printf("WIP: Save coords\n");
+          break;
+
+        case CAMERA:
+          printf("WIP: Camera\n");
+          break;
+
+        case SPHERE:
+          if(op[i].op.sphere.constants != NULL){
+            reflect = op[i].op.sphere.constants->s.c;
+          } else {
+            reflect = &white;
+          }
+          add_sphere(polygons, op[i].op.sphere.d[0], op[i].op.sphere.d[1], op[i].op.sphere.d[2], op[i].op.sphere.r, step_3d);
+          matrix_mult(peek(systems),polygons);
+          draw_polygons(polygons, t, zb, view, light, ambient, reflect);
+          polygons->lastcol = 0;
+          break;
+
+        case TORUS:
+          if(op[i].op.torus.constants != NULL){
+            reflect = op[i].op.torus.constants->s.c;
+          } else {
+            reflect = &white;
+          }
+          add_torus(polygons, op[i].op.torus.d[0], op[i].op.torus.d[1], op[i].op.torus.d[2], op[i].op.torus.r0, op[i].op.torus.r1, step_3d);
+          matrix_mult(peek(systems),polygons);
+          draw_polygons(polygons, t, zb, view, light, ambient, reflect);
+          polygons->lastcol = 0;
+          break;
+
+        case BOX:
+          if(op[i].op.box.constants != NULL){
+            reflect = op[i].op.box.constants->s.c;
+          } else {
+            reflect = &white;
+          }
+          add_box(polygons, op[i].op.box.d0[0], op[i].op.box.d0[1], op[i].op.box.d0[2], op[i].op.box.d1[0], op[i].op.box.d1[1], op[i].op.box.d1[2]);
+          matrix_mult(peek(systems),polygons);
+          draw_polygons(polygons, t, zb, view, light, ambient, reflect);
+          polygons->lastcol = 0;
+          break;
+
+        case LINE:
+          add_edge(edges, op[i].op.line.p0[0], op[i].op.line.p0[1], op[i].op.line.p0[2], op[i].op.line.p1[0], op[i].op.line.p1[1], op[i].op.line.p1[2]);
+          matrix_mult(peek(systems),edges);
+          draw_lines(edges, t, zb, g);
+          edges->lastcol = 0;
+          break;
+
+        case MESH:
+          printf("WIP: Mesh\n");
+          break;
+
+        case SET:
+          printf("WIP: Set\n");
+          break;
+
+        case MOVE:
+          tmp = make_translate(op[i].op.move.d[0], op[i].op.move.d[1], op[i].op.move.d[2]);
+          matrix_mult(peek(systems),tmp);
+          copy_matrix(tmp, peek(systems));
+           free_matrix(tmp);
+          break;
+
+        case SCALE:
+          tmp = make_scale(op[i].op.scale.d[0], op[i].op.scale.d[1], op[i].op.scale.d[2]);
+          matrix_mult(peek(systems),tmp);
+          copy_matrix(tmp, peek(systems));
+          free_matrix(tmp);
+          break;
+
+        case ROTATE:
+          op[i].op.rotate.degrees *= (M_PI / 180);
+          if(op[i].op.rotate.axis == 0) tmp = make_rotX(op[i].op.rotate.degrees);
+          else if(op[i].op.rotate.axis == 1) tmp = make_rotY(op[i].op.rotate.degrees);
+          else if(op[i].op.rotate.axis == 2) tmp = make_rotZ(op[i].op.rotate.degrees);
+          matrix_mult(peek(systems), tmp);
+          copy_matrix(tmp, peek(systems));
+          free_matrix(tmp);
+          break;
+          
+        case BASENAME:
+          printf("WIP: Basename\n");
+          break;
+        case SAVE_KNOBS:
+          printf("WIP: Save knobs\n");
+          break;
+        case TWEEN:
+          printf("WIP: Tween\n");
+          break;
+        case FRAMES:
+          printf("WIP: Frames\n");
+          break;
+        case VARY:
+          printf("WIP: Vary\n");
+          break;
+        case PUSH:
+          
+          push(systems);
+
+          break;
+        case POP:
+          
+          pop(systems);
+
+          break;
+        case GENERATE_RAYFILES:
+          printf("WIP: Generate rayfiles\n");
+          break;
+        case SAVE:
+          save_extension(t, op[i].op.save.p->name);
+
+          break;
+        case SHADING:
+          printf("WIP: Shading\n");
+          break;
+        case SETKNOBS:
+          printf("WIP: Set knobs\n");
+          break;
+        case FOCAL:
+          printf("WIP: Focal\n");
+          break;
+        case DISPLAY:
+          display(t);
+          break;
+        }
+  
+    //printf("\n");
   }
 }
