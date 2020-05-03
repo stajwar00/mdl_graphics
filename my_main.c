@@ -130,7 +130,8 @@ void my_main() {
         case SPHERE:
           if(op[i].op.sphere.constants != NULL){
             reflect = op[i].op.sphere.constants->s.c;
-          } else {
+          } 
+          else {
             reflect = &white;
           }
           add_sphere(polygons, op[i].op.sphere.d[0], op[i].op.sphere.d[1], op[i].op.sphere.d[2], op[i].op.sphere.r, step_3d);
@@ -142,7 +143,8 @@ void my_main() {
         case TORUS:
           if(op[i].op.torus.constants != NULL){
             reflect = op[i].op.torus.constants->s.c;
-          } else {
+          } 
+          else {
             reflect = &white;
           }
           add_torus(polygons, op[i].op.torus.d[0], op[i].op.torus.d[1], op[i].op.torus.d[2], op[i].op.torus.r0, op[i].op.torus.r1, step_3d);
@@ -154,7 +156,8 @@ void my_main() {
         case BOX:
           if(op[i].op.box.constants != NULL){
             reflect = op[i].op.box.constants->s.c;
-          } else {
+          } 
+          else {
             reflect = &white;
           }
           add_box(polygons, op[i].op.box.d0[0], op[i].op.box.d0[1], op[i].op.box.d0[2], op[i].op.box.d1[0], op[i].op.box.d1[1], op[i].op.box.d1[2]);
